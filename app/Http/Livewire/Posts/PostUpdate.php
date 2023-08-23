@@ -30,7 +30,7 @@ class PostUpdate extends Component
 
         if ($this->imageSource == 'url') {
             $rules['imageUrl'] = 'required_if:imageSource,url|url';
-        } elseif ($this->imageSource == 'upload' && !$this->imagePathCurrent) {
+        } elseif ($this->imageSource == 'upload') {
             $rules['imageUpload'] = 'required_if:imageSource,upload|image|max:1024';
         }
 
@@ -40,11 +40,17 @@ class PostUpdate extends Component
     public function updated($propertyName)
     {
         if ($propertyName == 'imageSource') {
+            $this->imagePathCurrent = null;
+
             if ($this->imageSource == 'url') {
                 $this->reset('imageUpload');
             } elseif ($this->imageSource == 'upload') {
                 $this->reset('imageUrl');
             }
+        }
+
+        if ($propertyName == 'imageUpload') {
+            $this->imagePathCurrent = null;
         }
 
         $this->validateOnly($propertyName);

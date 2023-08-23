@@ -16,12 +16,12 @@
             <div class="mb-5">
                 <x-label for="title" value="{{ __('Title') }}" />
                 <x-input id="title" class="block mt-1 w-full" type="text" name="title" wire:model="title" />
-                @error('title') <span class="error">{{ $message }}</span> @enderror
+                @error('title') <span class="text-red-500">{{ $message }}</span> @enderror
             </div>
             <div class="mb-5">
                 <x-label for="content" value="{{ __('Content') }}" />
                 <x-textarea id="content" class="block mt-1 w-full" type="text" name="content" rows="8" wire:model="content" />
-                @error('content') <span class="error">{{ $message }}</span> @enderror
+                @error('content') <span class="text-red-500">{{ $message }}</span> @enderror
             </div>
             <div class="mb-5">
                 <x-label for="featured_image" value="{{ __('Featured Image') }}" />
@@ -34,10 +34,10 @@
 
                 @if($imageSource == 'url')
                 <x-input id="imageUrl" class="block mt-1 w-full" type="text" wire:model="imageUrl" />
-                @error('imageUrl') <span class="error">{{ $message }}</span> @enderror
+                @error('imageUrl') <span class="text-red-500">{{ $message }}</span> @enderror
                 @else
                 <input id="imageUpload" class="block mt-1 w-full" type="file" wire:model="imageUpload" />
-                @error('imageUpload') <span class="error">{{ $message }}</span> @enderror
+                @error('imageUpload') <span class="text-red-500">{{ $message }}</span> @enderror
 
                 @if ($imageUpload && !$errors->has('imageUpload'))
                 <div class="text-blue-500 cursor-pointer" wire:click="$toggle('imagePreview')">Preview</div>
