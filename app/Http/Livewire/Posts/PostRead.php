@@ -10,6 +10,7 @@ class PostRead extends Component
     public $post;
     public $previousPost;
     public $nextPost;
+    public $showFeaturedImage = false;
 
     public function mount($slug)
     {

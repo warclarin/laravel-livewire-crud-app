@@ -24,14 +24,52 @@
                 @error('content') <span class="error">{{ $message }}</span> @enderror
             </div>
             <div class="mb-5">
-                <x-label for="featured_image.path" value="{{ __('Featured Image URL') }}" />
-                <x-input id="featured_image.path" class="block mt-1 w-full" type="text" name="featured_image.path" wire:model="featured_image.path" />
-                @error('featured_image.path') <span class="error">{{ $message }}</span> @enderror
+                <x-label for="featured_image" value="{{ __('Featured Image') }}" />
+                <div class="w-full mb-4">
+                    <select wire:model="imageSource" class="w-full rounded border px-3 py-2">
+                        <option value="url">URL</option>
+                        <option value="upload">Upload</option>
+                    </select>
+                </div>
+
+                @if($imageSource == 'url')
+                <x-input id="imageUrl" class="block mt-1 w-full" type="text" wire:model="imageUrl" />
+                @error('imageUrl') <span class="error">{{ $message }}</span> @enderror
+                @else
+                <input id="imageUpload" class="block mt-1 w-full" type="file" wire:model="imageUpload" />
+                @error('imageUpload') <span class="error">{{ $message }}</span> @enderror
+
+                @if ($imageUpload && !$errors->has('imageUpload'))
+                <div class="text-blue-500 cursor-pointer" wire:click="$toggle('imagePreview')">Preview</div>
+                @endif
+
+                @endif
             </div>
 
             <div>
                 <x-button class="mt-1">SUBMIT</x-button>
+                @if(session('slug'))
+                <x-button class="mt-1 bg-blue-500"><a href="/posts/{{ session('slug') }}">View Post</a></x-button>
+                @endif
             </div>
         </form>
+        <x-dialog-modal wire:model="imagePreview">
+            <x-slot name="title">
+                {{ __('Featured Image') }}
+            </x-slot>
+
+            <x-slot name="content">
+                @if ($imageUpload && !$errors->has('imageUpload'))
+                <img src="{{ $imageUpload->temporaryUrl() }}">
+                @endif
+            </x-slot>
+
+            <x-slot name="footer">
+                <x-secondary-button wire:click="$toggle('imagePreview')" wire:loading.attr="disabled">
+                    {{ __('Close') }}
+                </x-secondary-button>
+            </x-slot>
+        </x-dialog-modal>
+
     </div>
 </div>

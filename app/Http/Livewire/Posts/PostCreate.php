@@ -13,23 +13,38 @@ class PostCreate extends Component
 
     public $title;
     public $content;
-    public $featured_image = [
-        'source' => 'url',
-        'path' => ''
-    ];
+    public $imagePreview = false;
+    public $imageSource = 'upload';
+    public $imageUrl;
+    public $imageUpload;
 
-    protected $rules = [
-        'title' => ['required', 'unique:posts,title'],
-        'content' => ['required'],
-        'featured_image.path' => ['required']
-    ];
+    protected function rules()
+    {
+        $rules = [
+            'title' => ['required', 'unique:posts,title'],
+            'content' => ['required'],
+            'imageSource' => 'required|in:url,upload'
+        ];
 
-    protected $messages = [
-        'featured_image.path.required' => 'The featured image URL field is required.'
-    ];
+        if ($this->imageSource == 'url') {
+            $rules['imageUrl'] = 'required_if:imageSource,url|url';
+        } elseif ($this->imageSource == 'upload') {
+            $rules['imageUpload'] = 'required_if:imageSource,upload|image|max:1024';
+        }
+
+        return $rules;
+    }
 
     public function updated($propertyName)
     {
+        if ($propertyName == 'imageSource') {
+            if ($this->imageSource == 'url') {
+                $this->reset('imageUpload');
+            } elseif ($this->imageSource == 'upload') {
+                $this->reset('imageUrl');
+            }
+        }
+
         $this->validateOnly($propertyName);
     }
 
@@ -37,14 +52,26 @@ class PostCreate extends Component
     {
         $this->validate();
 
-        Post::create([
+        $path = null;
+
+        if ($this->imageSource == 'url') {
+            $path = $this->imageUrl;
+        } else {
+            $path = $this->imageUpload->store('posts', 'public');
+        }
+
+        $post = Post::create([
             'title' => $this->title,
             'slug' => Str::slug($this->title),
             'content' => $this->content,
-            'featured_image' => $this->featured_image
+            'featured_image' => [
+                'source' => $this->imageSource,
+                'path' => $path
+            ]
         ]);
 
         session()->flash('success', 'Post created');
+        session()->flash('slug', $post->slug);
 
         $this->reset();
     }
